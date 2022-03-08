@@ -8,3 +8,6 @@ __pycache__
 .idea
 *.bak
 reproduce/*
+data/
+pretrained_models/
+apex/
