@@ -109,7 +109,7 @@ if __name__ == '__main__':
                         help="Do not predict the tokens during decoding.")
 
     args = parser.parse_args()
-
+    
     with open(args.fin) as f:
         sharc_data = json.load(f)
     with open(args.fpred + '/dev.preds.json') as f:
@@ -121,19 +121,30 @@ if __name__ == '__main__':
         if ex['utterance_id'] in ids:
             sharc_data_filtered.append(ex)
     assert len(sharc_data_filtered) == len(sharc_pred)
-
+    # print(sharc_data_filtered[0])
+    # print(sharc_pred[0])
+    
     import evaluator_qg
     from pprint import pprint
     results_span = evaluator_qg.evaluate(sharc_data_filtered, sharc_pred, mode='follow_ups')
     pprint(results_span)
-
+    
     metrics = {}
     metrics.update({'span_' + k: v for k, v in results_span.items()})
 
     qg_data, input_lines = preprocess_qg(sharc_pred, sharc_data_filtered)
-    print('qg_data {}, input_lines {}'.format(len(qg_data), len(input_lines)))
-    output_lines = qg_s2s(opt=args, inputs=input_lines)
-    print("output_lines {}".format(len(output_lines)))
+    # print("=="*40)
+    # print(qg_data[2])
+    # print("=="*40)
+    # print(input_lines[2])
+    # print("=="*40)
+    
+    # print('qg_data {}, input_lines {}'.format(len(qg_data), len(input_lines)))
+    output_lines = qg_s2s(opt=args, inputs=input_lines) #, isEvaluate=True)
+    # print("output_lines {}".format(len(output_lines)))
+    # print(output_lines)
+    # print("=="*40)
+    
     qg_preds = []
     for ex, input_line, output_line in zip(qg_data, input_lines, output_lines):
         assert ex['src'] == input_line

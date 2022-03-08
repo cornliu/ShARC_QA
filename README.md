@@ -140,7 +140,7 @@ PYT_SEGBOT sharc_discourse_segmentation.py
 We find in some cases, there are some extra/missing spaces in ShARC questions. Here we fix them by merging these questions:
 
 ```shell
-PYT_DISCERN fix_questions.py
+PYT_DISCERN fix_question.py
 ```
 
 ## Decision Making (Section 2.2)
@@ -258,7 +258,8 @@ PYT_QG -u qg.py \
 --fin=./data/sharc_raw/json/sharc_dev.json \
 --fpred=./out/inference_span \  # directory of span prediction
 --model_recover_path=/absolute/path/to/pretrained_models/qg.bin \
---cache_path=/absolute/path/to/pretrain_models/unilm/
+--cache_path=/absolute/path/to/pretrained_models/unilm/
+--bert_model="bert-large-cased"
 ```
 
 Oracle question generation evaluation results of our released model `unilmqg.bin` (dev. set):

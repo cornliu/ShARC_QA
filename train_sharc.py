@@ -26,7 +26,7 @@ if __name__ == '__main__':
     parser.add_argument('--debug', action='store_true', help='debug flag to load less data')
     parser.add_argument('--dsave', default='saved_models/{}', help='save directory')
     parser.add_argument('--model', default='base_argpred', help='model to use')
-    parser.add_argument('--pretrained_lm_path', default='./pretrained_models/roberta_base/', help='path/to/pretrained/lm')
+    parser.add_argument('--pretrained_lm_path', default='./pretrained_models/roberta_base', help='path/to/pretrained/lm')
     parser.add_argument('--early_stop', default='dev_macro_accuracy', help='early stopping metric')
     parser.add_argument('--bert_hidden_size', default=768, type=int, help='hidden size for the bert model')
     parser.add_argument('--data', default='sharc', help='directory for data')

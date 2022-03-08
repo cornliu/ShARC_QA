@@ -16,7 +16,7 @@ IGNORE_WORDS = MATCH_IGNORE | PUNCT_WORDS
 MAX_LEN = 350
 FILENAME = 'roberta_base'
 FORCE=False
-MODEL_FILE = '/research/king3/ik_grp/yfgao/pretrain_models/huggingface/roberta-base'
+MODEL_FILE = './pretrained_models/roberta_base'
 tokenizer = RobertaTokenizer.from_pretrained(MODEL_FILE, cache_dir=None)
 DECISION_CLASSES = ['yes', 'no', 'more', 'irrelevant']
 ENTAILMENT_CLASSES = ['yes', 'no', 'unknown']
@@ -217,13 +217,13 @@ if __name__ == '__main__':
     with open(os.path.join(sharc_path, 'sharc_raw', 'negative_sample_utterance_ids',
                            'sharc_negative_question_utterance_ids.txt')) as f:
         negative_question_ids = f.read().splitlines()
+    # print(negative_question_ids)
     for split in ['dev', 'train']:
         fsplit = 'sharc_train' if split == 'train' else 'sharc_dev'
         with open(os.path.join(sharc_path, 'sharc_raw/json/{}_question_fixed.json'.format(fsplit))) as f:
             data_raw = json.load(f)
         with open(os.path.join(sharc_path, '{}_snippet_parsed.json'.format(split))) as f:
             edu_segment = json.load(f)
-
         ########################
         # construct tree mappings
         ########################

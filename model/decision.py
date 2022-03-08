@@ -11,7 +11,8 @@ from pprint import pformat
 from collections import defaultdict
 from torch import nn
 from torch.nn import functional as F
-from transformers import RobertaTokenizer, RobertaModel, RobertaConfig, AdamW, get_linear_schedule_with_warmup
+import transformers
+from transformers import RobertaTokenizer, RobertaConfig, AdamW, get_linear_schedule_with_warmup
 from argparse import Namespace
 from model.transformer import TransformerEncoder, TransformerEncoderLayer
 from torch.nn.init import xavier_uniform_
@@ -31,7 +32,7 @@ class Module(nn.Module):
         # roberta_model_path = '/research/king3/ik_grp/yfgao/pretrain_models/huggingface/roberta-base'
         roberta_model_path = args.pretrained_lm_path
         roberta_config = RobertaConfig.from_pretrained(roberta_model_path, cache_dir=None)
-        self.roberta = RobertaModel.from_pretrained(roberta_model_path, cache_dir=None, config=roberta_config)
+        self.roberta = transformers.RobertaModel.from_pretrained(roberta_model_path, cache_dir=None, config=roberta_config)
         encoder_layer = TransformerEncoderLayer(self.args.bert_hidden_size, 12, 4 * self.args.bert_hidden_size)
         encoder_norm = nn.LayerNorm(self.args.bert_hidden_size)
         self.transformer_encoder = TransformerEncoder(encoder_layer, args.trans_layer, encoder_norm)

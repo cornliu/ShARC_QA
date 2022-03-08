@@ -2,11 +2,14 @@ import os
 import json
 import csv
 import re
-import nltk.data
-
+import nltk
+nltk.download('punkt')
 sharc_path = '../data'
 
-
+# context過tokenizers的規則：
+# 1. 若snippet中沒有bullet(*)，也就是沒有條列說明，則全部丟到tokenizers中對文字做分詞
+# 2. 若有bullet(*)，則每一個條列說明的點就是一個分詞，而在bullet(*)之前的句子若只是單一一個句子則該句子為一個分詞
+#    若有多個句子，則丟到tokenizers中對文字做分詞
 def parsing_snippet(snippet):
     title_matched = re.match(r'#.{2,}\n\n', snippet)
     if title_matched:
@@ -55,8 +58,8 @@ for split in ['dev', 'train']:
             task = tasks[ex['tree_id']] = {'snippet': ex['snippet']}
     for id, v in tasks.items():
         title, clauses, is_bullet = parsing_snippet(v['snippet'])
-        tasks[id]['title'] = title
-        tasks[id]['clauses'] = clauses
+        tasks[id]['title'] = title          # 有##...\n\n的句子
+        tasks[id]['clauses'] = clauses      # title 之後的句子
         tasks[id]['is_bullet'] = is_bullet
     with open(os.path.join(sharc_path, '{}_snippet_parsed.json'.format(split)), 'wt') as f:
         json.dump(tasks, f, indent=2)

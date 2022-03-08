@@ -10,4 +10,5 @@ __pycache__
 reproduce/*
 data/
 pretrained_models/
-apex/
+transformers
+out/

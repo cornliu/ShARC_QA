@@ -197,7 +197,6 @@ def evaluate(ground_truths, predictions, mode='follow_ups'):
 
     # Check if all IDs are aligned
     # assert len(ground_truths) == len(predictions), "Predictions and ground truths have different sample sizes"
-
     ground_truth_map = {g["utterance_id"]: g for g in ground_truths}
     predictions_map = {p["utterance_id"]: p for p in predictions}
     for k in ground_truth_map:

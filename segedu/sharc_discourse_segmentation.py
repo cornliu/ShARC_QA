@@ -11,6 +11,8 @@ from solver import TrainSolver
 
 from model import PointerNetworks
 
+# 把前一步做的分詞切成一個一個小單元的edu，若有bullet(*)則不切
+
 class Lang:
     def __init__(self, name):
         self.name = name
