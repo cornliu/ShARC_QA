@@ -5,7 +5,8 @@ import string
 import json
 from tqdm import tqdm
 import editdistance
-from transformers import RobertaTokenizer
+from transformers import RobertaTokenizer, BertTokenizer
+from transformers import AutoTokenizer, SplinterConfig, SplinterTokenizer
 
 
 MATCH_IGNORE = {'do', 'did', 'does',
@@ -14,16 +15,25 @@ MATCH_IGNORE = {'do', 'did', 'does',
 PUNCT_WORDS = set(string.punctuation)
 IGNORE_WORDS = MATCH_IGNORE | PUNCT_WORDS
 MAX_LEN = 350
-FILENAME = 'roberta_base'
 FORCE=False
-MODEL_FILE = '/research/king3/ik_grp/yfgao/pretrain_models/huggingface/roberta-base'
-tokenizer = RobertaTokenizer.from_pretrained(MODEL_FILE, cache_dir=None)
+
+# MODEL_FILE = '/research/king3/ik_grp/yfgao/pretrain_models/huggingface/roberta-base'
+# MODEL_FILE = '/work/jgtf0322/ShARC_QA/pretrained_models/roberta_base'
+MODEL_FILE = '/work/jgtf0322/ShARC_QA/pretrained_models/splinter_base'
+if "splinter" in MODEL_FILE:
+    print("Use splinter")
+    FILENAME = 'splinter_base'
+    tokenizer = SplinterTokenizer.from_pretrained(MODEL_FILE, add_prefix_space=True, cache_dir=None)
+else: 
+    FILENAME = 'roberta_base'
+    tokenizer = RobertaTokenizer.from_pretrained(MODEL_FILE, add_prefix_space=True, cache_dir=None)
+
 DECISION_CLASSES = ['yes', 'no', 'more', 'irrelevant']
 ENTAILMENT_CLASSES = ['yes', 'no', 'unknown']
 
 
 def roberta_encode(doc):
-    encoded = tokenizer.encode(doc.strip('\n').strip(), add_prefix_space=True, add_special_tokens=False)
+    encoded = tokenizer.encode(doc.strip('\n').strip(), add_special_tokens=False)
     return encoded
 
 
@@ -137,6 +147,21 @@ def _extract_edus(all_edus, title_tokenized, sentences_tokenized):
                         edus_tokenized_i.append(current_sentence_tokenized[p_start:p_end + 1])
                         p_start = p_end + 1
                         break
+
+            a = len(current_edus) != len(edus_tokenized_i) | len(edus_tokenized_i) != len(edus_span_i)
+            b = p_end != len(current_sentence_tokenized) - 1
+            if a | b:
+                print(a, b)
+                for edu in current_edus:
+                    edu = edu.strip('\n').strip().replace(' ', '').lower()
+                    # handle exception case train 261
+                    if ('``' in edu) and ('\'\'' in edu):
+                        edu = edu.replace('``', '"').replace('\'\'', '"')
+                    print(edu)
+                    string = roberta_decode(current_sentence_tokenized).replace(' ', '').lower()
+                    # string = string.replace("'", "")
+                    print(string)
+            
             assert len(current_edus) == len(edus_tokenized_i) == len(edus_span_i)
             assert p_end == len(current_sentence_tokenized) - 1
             edus_span.append(edus_span_i)  # [sent_idx, ]
@@ -244,6 +269,7 @@ if __name__ == '__main__':
                     task['scenarios'].add(ex['scenario'])
                 task['initial_questions'].add(ex['question'])
             keys = sorted(list(tasks.keys()))
+
             vals = [extract_edus(tasks[k], edu_segment[k]) for k in tqdm(keys)]
             mapping = {k: v for k, v in zip(keys, vals)}
             with open(ftree, 'wt') as f:

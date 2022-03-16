@@ -12,6 +12,7 @@ from collections import defaultdict
 from torch import nn
 from torch.nn import functional as F
 from transformers import RobertaTokenizer, RobertaModel, RobertaConfig, AdamW, get_linear_schedule_with_warmup
+from transformers import SplinterConfig, SplinterModel, SplinterForQuestionAnswering, AutoTokenizer, BertModel
 from argparse import Namespace
 from model.transformer import TransformerEncoder, TransformerEncoderLayer
 from torch.nn.init import xavier_uniform_
@@ -30,8 +31,14 @@ class Module(nn.Module):
         # Entailment Tracking
         # roberta_model_path = '/research/king3/ik_grp/yfgao/pretrain_models/huggingface/roberta-base'
         roberta_model_path = args.pretrained_lm_path
-        roberta_config = RobertaConfig.from_pretrained(roberta_model_path, cache_dir=None)
-        self.roberta = RobertaModel.from_pretrained(roberta_model_path, cache_dir=None, config=roberta_config)
+        if "splinter" in roberta_model_path: 
+            print("Use splinter")
+            splinter_config = SplinterConfig.from_pretrained(roberta_model_path, cache_dir=None)
+            self.roberta = SplinterModel.from_pretrained(roberta_model_path, cache_dir=None, config=splinter_config)
+        else: 
+            roberta_config = RobertaConfig.from_pretrained(roberta_model_path, cache_dir=None)
+            self.roberta = RobertaModel.from_pretrained(roberta_model_path, cache_dir=None, config=roberta_config)
+
         encoder_layer = TransformerEncoderLayer(self.args.bert_hidden_size, 12, 4 * self.args.bert_hidden_size)
         encoder_norm = nn.LayerNorm(self.args.bert_hidden_size)
         self.transformer_encoder = TransformerEncoder(encoder_layer, args.trans_layer, encoder_norm)
@@ -100,16 +107,16 @@ class Module(nn.Module):
 
     def forward(self, batch):
         out = self.create_input_tensors(batch)
-        out['roberta_enc'] = roberta_enc = self.roberta(input_ids=out['input_ids'], attention_mask=out['input_mask'])[0]
-
+        roberta_enc = self.roberta(input_ids=out['input_ids'], attention_mask=out['input_mask'])[0]
+        out['roberta_enc'] = roberta_enc
         # transformer encoding
         tenc_input, tenc_mask = [], []
         rule_mask = []
         for idx, e in enumerate(batch):
             tenc_idx = torch.cat([e['entail']['rule_idx'], e['entail']['user_idx']], dim=-1).to(self.device)
             tenc_input.append(torch.index_select(roberta_enc[idx], 0, tenc_idx))
-            tenc_mask.append(torch.tensor([False] * tenc_idx.shape[0], dtype=torch.uint8))
-            rule_mask.append(torch.tensor([1] * e['entail']['rule_idx'].shape[0], dtype=torch.uint8))
+            tenc_mask.append(torch.tensor([False] * tenc_idx.shape[0], dtype=torch.bool))
+            rule_mask.append(torch.tensor([1] * e['entail']['rule_idx'].shape[0], dtype=torch.bool))
         if self.args.trans_layer > 0:
             tenc_input_padded = torch.nn.utils.rnn.pad_sequence(tenc_input).to(self.device)  # [seqlen, N, dmodel]
             tenc_mask_padded = torch.nn.utils.rnn.pad_sequence(tenc_mask, batch_first=True, padding_value=True).to(self.device)
@@ -236,7 +243,6 @@ class Module(nn.Module):
                 actual_train_batch = int(self.args.train_batch / self.args.gradient_accumulation_steps)
                 batch_stats = defaultdict(list)
                 batch = train[i: i + self.args.train_batch]
-
                 for accu_i in range(0, len(batch), actual_train_batch):
                     actual_batch = batch[accu_i : accu_i + actual_train_batch]
                     out = self(actual_batch)
