@@ -15,7 +15,7 @@ PUNCT_WORDS = set(string.punctuation)
 IGNORE_WORDS = MATCH_IGNORE | PUNCT_WORDS
 MAX_LEN = 350
 FILENAME = 'roberta_base'
-FORCE=False
+FORCE=True
 MODEL_FILE = './pretrained_models/roberta_base'
 tokenizer = RobertaTokenizer.from_pretrained(MODEL_FILE, cache_dir=None)
 DECISION_CLASSES = ['yes', 'no', 'more', 'irrelevant']
