@@ -18,11 +18,12 @@ from torch.utils.data.distributed import DistributedSampler
 import random
 import pickle
 
+import unilmqg.pytorch_pretrained_bert
 from pytorch_pretrained_bert.tokenization import BertTokenizer, WhitespaceTokenizer
 from pytorch_pretrained_bert.modeling import BertForSeq2SeqDecoder
 from pytorch_pretrained_bert.optimization import BertAdam, warmup_linear
 
-from nn.data_parallel import DataParallelImbalance
+from unilmqg.nn.data_parallel import DataParallelImbalance
 import biunilm.seq2seq_loader as seq2seq_loader
 from evaluator import MoreEvaluator, prepro
 from pprint import pprint
@@ -183,7 +184,7 @@ def main(opt=None, inputs=None, isEvaluate=False):
     for model_recover_path in glob.glob(args.model_recover_path.strip()):
         logger.info("***** Recover model: %s *****", model_recover_path)
         model_recover = torch.load(model_recover_path, map_location=lambda storage, loc: storage)
-        model = BertForSeq2SeqDecoder.from_pretrained(args.cache_path, state_dict=model_recover, num_labels=cls_num_labels, num_rel=pair_num_relation, type_vocab_size=type_vocab_size, task_idx=3, mask_word_id=mask_word_id, search_beam_size=args.beam_size,
+        model = unilmqg.pytorch_pretrained_bert.modeling.BertForSeq2SeqDecoder.from_pretrained(args.cache_path, state_dict=model_recover, num_labels=cls_num_labels, num_rel=pair_num_relation, type_vocab_size=type_vocab_size, task_idx=3, mask_word_id=mask_word_id, search_beam_size=args.beam_size,
                                                       length_penalty=args.length_penalty, eos_id=eos_word_ids, sos_id=sos_word_id, forbid_duplicate_ngrams=args.forbid_duplicate_ngrams, forbid_ignore_set=forbid_ignore_set, not_predict_set=not_predict_set, ngram_size=args.ngram_size, min_len=args.min_len, mode=args.mode, max_position_embeddings=args.max_seq_length, ffn_type=args.ffn_type, num_qkv=args.num_qkv, seg_emb=args.seg_emb, pos_shift=args.pos_shift)
         del model_recover
 
@@ -206,7 +207,7 @@ def main(opt=None, inputs=None, isEvaluate=False):
                     input_lines = input_lines[:args.subset]
         else:
             input_lines = inputs
-        data_tokenizer = WhitespaceTokenizer() if args.tokenized_input else tokenizer
+        data_tokenizer = pytorch_pretrained_bert.tokenization.WhitespaceTokenizer() if args.tokenized_input else tokenizer
         input_lines = [data_tokenizer.tokenize(
             x)[:max_src_length] for x in input_lines]
         input_lines = sorted(list(enumerate(input_lines)),

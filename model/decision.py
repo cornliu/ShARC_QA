@@ -1,3 +1,9 @@
+import transformers
+if transformers.__version__ != '4.17.0':
+    print(f"your current version is {transformers.__version__}, if you want to use splinter, please upgrade your transformers version to 4.17.0")
+else: 
+    from transformers import SplinterConfig, SplinterModel, SplinterForQuestionAnswering, AutoTokenizer, BertModel
+
 import os
 import shutil
 import torch
@@ -12,7 +18,6 @@ from collections import defaultdict
 from torch import nn
 from torch.nn import functional as F
 from transformers import RobertaTokenizer, RobertaModel, RobertaConfig, AdamW, get_linear_schedule_with_warmup
-from transformers import SplinterConfig, SplinterModel, SplinterForQuestionAnswering, AutoTokenizer, BertModel
 from argparse import Namespace
 from model.transformer import TransformerEncoder, TransformerEncoderLayer
 from torch.nn.init import xavier_uniform_
@@ -31,7 +36,7 @@ class Module(nn.Module):
         # Entailment Tracking
         # roberta_model_path = '/research/king3/ik_grp/yfgao/pretrain_models/huggingface/roberta-base'
         roberta_model_path = args.pretrained_lm_path
-        if "splinter" in roberta_model_path: 
+        if (transformers.__version__ == "4.17.0") & ("splinter" in roberta_model_path): 
             print("Use splinter")
             splinter_config = SplinterConfig.from_pretrained(roberta_model_path, cache_dir=None)
             self.roberta = SplinterModel.from_pretrained(roberta_model_path, cache_dir=None, config=splinter_config)

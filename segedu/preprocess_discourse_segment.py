@@ -2,7 +2,8 @@ import os
 import json
 import csv
 import re
-import nltk.data
+import nltk
+nltk.download('punkt')
 
 sharc_path = '../data'
 

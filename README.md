@@ -237,6 +237,31 @@ PYT_DISCERN -u train_sharc.py \
 --resume=./pretrained_models/span.pt \
 --test
 ```
+### Span Extraction for all decisions
+upgrade pytorch version
+```
+conda install pytorch==1.10.2 cudatoolkit=10.2 -c pytorch
+```
+> preprocess span extraction
+
+* set args `use_all_decisions` to `true`
+```shell
+PYT_DISCERN preprocess_span.py --use_all_decisions=true
+```
+> inference
+
+* set args `use_all_decisions` to `true`
+```shell
+PYT_DISCERN -u train_sharc.py \
+--dsave="out/{}" \
+--model=span \
+--data=./data/ \
+--data_type=span_roberta_base \
+--prefix=inference_span \
+--resume=./pretrained_models/span.pt \
+--test \
+--use_all_decisions=true
+```
 
 Our trained model 'span.pt' achieves the following intermediate results:
 

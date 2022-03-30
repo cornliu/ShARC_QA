@@ -1,6 +1,3 @@
-
-
-
 import re
 from nltk.tokenize import word_tokenize
 import pickle
@@ -10,7 +7,6 @@ import torch
 from solver import TrainSolver
 
 from model import PointerNetworks
-
 class Lang:
     def __init__(self, name):
         self.name = name
@@ -127,7 +123,7 @@ if __name__ == '__main__':
     import csv
     from tqdm import tqdm
 
-    sharc_path = '../data'
+    sharc_path = '../data/'
     for split in ['train', 'dev']:
         with open(os.path.join(sharc_path, '{}_snippet_parsed.json'.format(split))) as f:
             tasks = json.load(f)

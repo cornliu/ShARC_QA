@@ -129,7 +129,13 @@ class Module(nn.Module):
             pred_i['answer_span_end'] = top_e
             pred_i['answer'] = top_ans
             pred_i['answer_sent_jdx'] = top_j
+
+            # add gt to analyse
+            if ex['answer'].lower() in ['yes', 'no', 'irrelevant']:
+                pred_i['gt'] = ex['answer']
+
             preds.append(pred_i)
+
         return preds
 
     def forward(self, batch):

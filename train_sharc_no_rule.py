@@ -40,6 +40,9 @@ if __name__ == '__main__':
     parser.add_argument('--trans_layer', default=2, type=int, help='num of layers for transformer encoder/decoder')
     parser.add_argument('--eval_every_steps', default=50, type=int, help='evaluate model every xxx steps')
 
+    print(args.data)
+    print(args.data_type)
+
     args = parser.parse_args()
     args.dsave = args.dsave.format(args.prefix)
     pathlib.Path(args.dsave).mkdir(parents=True, exist_ok=True)

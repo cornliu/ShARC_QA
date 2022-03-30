@@ -243,7 +243,7 @@ class MultiheadAttention(nn.Module):
                     output += bias
                 ret = output
             return ret
-
+        
         tgt_len, bsz, embed_dim = query.size()
         assert embed_dim == embed_dim_to_check
         assert key.size() == value.size()

@@ -18,8 +18,8 @@ MAX_LEN = 350
 FORCE=False
 
 # MODEL_FILE = '/research/king3/ik_grp/yfgao/pretrain_models/huggingface/roberta-base'
-# MODEL_FILE = '/work/jgtf0322/ShARC_QA/pretrained_models/roberta_base'
-MODEL_FILE = '/work/jgtf0322/ShARC_QA/pretrained_models/splinter_base'
+MODEL_FILE = '/work/jgtf0322/ShARC_QA/pretrained_models/roberta_base'
+# MODEL_FILE = '/work/jgtf0322/ShARC_QA/pretrained_models/splinter_base'
 if "splinter" in MODEL_FILE:
     print("Use splinter")
     FILENAME = 'splinter_base'

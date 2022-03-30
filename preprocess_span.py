@@ -10,7 +10,7 @@ from tqdm import tqdm
 from pprint import pprint
 import editdistance
 from transformers import RobertaTokenizer
-
+from argparse import ArgumentParser
 
 MATCH_IGNORE = {'do', 'did', 'does',
                 'is', 'are', 'was', 'were', 'have', 'will', 'would',
@@ -229,14 +229,22 @@ def compute_metrics(preds, data):
 
 
 if __name__ == '__main__':
+
+    # passing parameters
+    parser = ArgumentParser()
+    parser.add_argument('--use_all_decisions', default=False, type=bool, help='pass all decisions')
+    args = parser.parse_args()
+
     sharc_path = './data/'
     with open(os.path.join(sharc_path, 'sharc_raw', 'negative_sample_utterance_ids',
                            'sharc_negative_question_utterance_ids.txt')) as f:
         negative_question_ids = f.read().splitlines()
+
     for split in ['dev', 'train']:
         fsplit = 'sharc_train' if split == 'train' else 'sharc_dev'
         with open(os.path.join(sharc_path, 'sharc_raw/json/{}_question_fixed.json'.format(fsplit))) as f:
             data_raw = json.load(f)
+
         ########################
         # construct tree mappings
         ########################
@@ -251,7 +259,8 @@ if __name__ == '__main__':
         data = []
         num_edu = []
         for ex in tqdm(data_raw):
-            if ex['answer'].lower() in ['yes', 'no', 'irrelevant']:
+
+            if (not args.use_all_decisions) & (ex['answer'].lower() in ['yes', 'no', 'irrelevant']):
                 continue
 
             ex_answer = ex['answer'].lower()
@@ -266,7 +275,12 @@ if __name__ == '__main__':
             pad = tokenizer.pad_token_id
 
             # span extraction
-            span_clause_id, span_clause_start, span_clause_end, span_clause_dist = m['q2clause'][ex['answer']].values()
+            # Set default follow up question span to None for "yes", "no", "irrelevant" cases.
+            # For this part, however, I'm not sure whether I'm right :).
+            span_clause_id, span_clause_start, span_clause_end, span_clause_dist = None, None, None, None
+            if ex['answer'].lower() not in ['yes', 'no', 'irrelevant']:
+                span_clause_id, span_clause_start, span_clause_end, span_clause_dist = m['q2clause'][ex['answer']].values()
+
             span_offset = 0
             span_pointer_mask = []
 
@@ -284,11 +298,12 @@ if __name__ == '__main__':
                     span_pointer_mask += ([0] + [1] * len(clause))  # [0] for [CLS]
             inp += [sep]
 
-            # add answer span
-            span_se = (span_clause_start + span_offset, span_clause_end + span_offset)  # [,] both inclusive
-            answer_span_test = inp[span_se[0]:span_se[1]+1]
-            answer_span_test_2 = m['clause_t'][span_clause_id][span_clause_start:span_clause_end+1]
-            assert answer_span_test == answer_span_test_2
+            # add answer span if answer is not "yes", "no" or "irrelevant"
+            if ex['answer'].lower() not in ['yes', 'no', 'irrelevant']: 
+                span_se = (span_clause_start + span_offset, span_clause_end + span_offset)  # [,] both inclusive
+                answer_span_test = inp[span_se[0]:span_se[1]+1]
+                answer_span_test_2 = m['clause_t'][span_clause_id][span_clause_start:span_clause_end+1]
+                assert answer_span_test == answer_span_test_2
 
             # user info (scenario, dialog history)
             user_idx = []
@@ -329,16 +344,24 @@ if __name__ == '__main__':
                 'user_idx': torch.LongTensor(user_idx),
                 'question_idx': question_idx,
                 'scenario_idx': scenario_idx,
-                'answer_span': span_se,
-                'answer_span_start': span_se[0],
-                'answer_span_end': span_se[1],
                 'span_pointer_mask': torch.LongTensor(span_pointer_mask),
                 'selected_edu_idx': selected_edu_idx,  # which edu contains the span
             }
 
+            # add answer span if answer is not "yes", "no" or "irrelevant"
+            if ex['answer'].lower() not in ['yes', 'no', 'irrelevant']:
+                answer = {'answer_span': span_se,
+                        'answer_span_start': span_se[0],
+                        'answer_span_end': span_se[1]}
+                ex['entail'] = {**ex['entail'], **answer}
             data.append(ex)
+
         print('{}: {}'.format(split, len(data)))
-        preds = [{'utterance_id': e['utterance_id'],
-                  'answer': roberta_decode(e['entail']['inp'][e['entail']['answer_span'][0]:e['entail']['answer_span'][1] + 1])} for e in data]
-        pprint(compute_metrics(preds, data))
+
+        # only if we are using "inquire" case can we compute metrics.
+        if not args.use_all_decisions:
+            preds = [{'utterance_id': e['utterance_id'],
+                    'answer': roberta_decode(e['entail']['inp'][e['entail']['answer_span'][0]:e['entail']['answer_span'][1] + 1])} for e in data]
+            pprint(compute_metrics(preds, data))
+
         torch.save(data, fproc)

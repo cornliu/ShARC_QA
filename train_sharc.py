@@ -38,6 +38,7 @@ if __name__ == '__main__':
     parser.add_argument('--bert_model', default='base', help='bert model')
     parser.add_argument('--trans_layer', default=2, type=int, help='num of layers for transformer encoder/decoder')
     parser.add_argument('--eval_every_steps', default=50, type=int, help='evaluate model every xxx steps')
+    parser.add_argument('--use_all_decisions', default=False, type=bool, help='pass all decisions')
 
     args = parser.parse_args()
     args.dsave = args.dsave.format(args.prefix)
@@ -52,13 +53,12 @@ if __name__ == '__main__':
         torch.backends.cudnn.benchmark = False
         torch.cuda.manual_seed_all(args.seed)
         device = torch.device('cuda')
-
     if args.debug:
         limit = 27
-        data = {k: torch.load('{}/proc_{}_{}.pt'.format(args.data, args.data_type, 'dev'))[:limit] for k in ['train', 'dev']}
+        data = {k: torch.load('{}proc_{}_{}.pt'.format(args.data, args.data_type, 'dev'))[:limit] for k in ['train', 'dev']}
     else:
         limit = None
-        data = {k: torch.load('{}/proc_{}_{}.pt'.format(args.data, args.data_type, k))[:limit] for k in ['dev', 'train']}
+        data = {k: torch.load('{}proc_{}_{}.pt'.format(args.data, args.data_type, k))[:limit] for k in ['dev', 'train']}
 
     if args.resume:
         print('resuming model from ' + args.resume)
@@ -75,7 +75,10 @@ if __name__ == '__main__':
         print('saving {}'.format(os.path.join(args.dsave, 'dev.preds.json')))
         with open(os.path.join(args.dsave, 'dev.preds.json'), 'wt') as f:
             json.dump(preds, f, indent=2)
-        metrics = model.compute_metrics(preds, data['dev'])
-        pprint(metrics)
+
+        # only if we are using "inquire" case can we compute metrics.
+        if not args.use_all_decisions:
+            metrics = model.compute_metrics(preds, data['dev'])
+            pprint(metrics)
     else:
         model.run_train(data['train'], data['dev'])
