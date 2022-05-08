@@ -123,28 +123,11 @@ You can also download our pretrained models and our dev set predictions:
     └── span.pt
 ```
 
-## Discourse Segmentation of Rules (Section 2.1)
-
-We use [SegBot](http://138.197.118.157:8000/segbot/) and [their implementation](https://www.dropbox.com/sh/tsr4ixfaosk2ecf/AACvXU6gbZfGLatPXDrzNcXCa?dl=0) to segment rules in the ShARC regulation snippets.
-
+## Using [splinter](https://arxiv.org/pdf/2101.00438.pdf) model to do decision Making (Section 2.2)
+> Update transformers version to 4.17.0 under PYT_DISCERN environment
 ```shell
-cd segedu
-PYT_SEGBOT preprocess_discourse_segment.py
-PYT_SEGBOT sharc_discourse_segmentation.py
+pip install transformers==4.17.0
 ```
-
-`data/train_snippet_parsed.json` and `data/dev_snippet_parsed.json` are parsed rules.
-
-## Fix Questions in ShARC
-
-We find in some cases, there are some extra/missing spaces in ShARC questions. Here we fix them by merging these questions:
-
-```shell
-PYT_DISCERN fix_questions.py
-```
-
-## Decision Making (Section 2.2)
-
 > preprocess: prepare inputs for RoBERTa, generate labels for entailment supervision
 
 ```shell
@@ -154,146 +137,24 @@ PYT_DISCERN preprocess_decision.py
 > training
 
 ```shell
-PYT_DISCERN -u train_sharc.py \
---train_batch=16 \
---gradient_accumulation_steps=2 \
---epoch=5 \
---seed=323 \
---learning_rate=5e-5 \
---loss_entail_weight=3.0 \
---dsave="out/{}" \
---model=decision \
---early_stop=dev_0a_combined \
---data=./data/ \
---data_type=decision_roberta_base \
---prefix=train_decision \
---trans_layer=2 \
---eval_every_steps=300  # 516
+MODEL="splinter"
+python3 -u train_sharc.py \
+    --train_batch=16 \
+    --gradient_accumulation_steps=2 \
+    --epoch=5 \
+    --seed=323 \
+    --learning_rate=5e-5 \
+    --loss_entail_weight=3.0 \
+    --dsave="./out/{}" \
+    --model=decision \
+    --early_stop=dev_0a_combined \
+    --data=./data/ \
+    --data_type=decision_splinter_base \
+    --prefix=train_decision \
+    --trans_layer=2 \
+    --eval_every_steps=300 \
+    --pretrained_lm_path="tau/splinter-base"
 ```
-
-> inference
-
-Here we can directly do interence using our trained model `decision.pt`. You can also replace it with your own models by setting `--resume=/path/to/your/trained/models`.
-
-```shell
-PYT_DISCERN train_sharc.py \
---dsave="./out/{}" \
---model=decision \
---data=./data/ \
---data_type=decision_roberta_base \
---prefix=inference_decision \
---resume=./pretrained_models/decision.pt \
---trans_layer=2 \
---test
-```
-
-The prediction file is saved at './out/inference_decision/dev.preds.json'.
-Our model achieves the following performance on the development set using our pre-trained model `decision.pt`:
-
-| Micro Acc. | Macro Acc. |
-|:----------:|:----------:|
-|    74.85   |    79.79   |
-
-
-## Follow-up Question Generation (Section 2.3)
-
-For the follow-up question generation task, we firstly use a span-extraction model to extract the underspecified span within the rule text, then use UniLM to rephrase the span into a well-formed question.
-
-### Span Extraction
-
-> preprocess span extraction
-
-```
-PYT_DISCERN preprocess_span.py
-```
-
-> training
-
-```shell
-PYT_DISCERN -u train_sharc.py \
---train_batch=16 \
---gradient_accumulation_steps=2 \
---epoch=5 \
---seed=115 \
---learning_rate=5e-5 \
---dsave="out/{}" \
---model=span \
---early_stop=dev_0_combined \
---data=./data/ \
---data_type=span_roberta_base \
---prefix=train_span \
---eval_every_steps=100
-```
-
-> inference
-
-```shell
-PYT_DISCERN -u train_sharc.py \
---dsave="out/{}" \
---model=span \
---data=./data/ \
---data_type=span_roberta_base \
---prefix=inference_span \
---resume=./pretrained_models/span.pt \
---test
-```
-### Span Extraction for all decisions
-upgrade pytorch version
-```
-conda install pytorch==1.10.2 cudatoolkit=10.2 -c pytorch
-```
-> preprocess span extraction
-
-* set args `use_all_decisions` to `true`
-```shell
-PYT_DISCERN preprocess_span.py --use_all_decisions=true
-```
-> inference
-
-* set args `use_all_decisions` to `true`
-```shell
-PYT_DISCERN -u train_sharc.py \
---dsave="out/{}" \
---model=span \
---data=./data/ \
---data_type=span_roberta_base \
---prefix=inference_span \
---resume=./pretrained_models/span.pt \
---test \
---use_all_decisions=true
-```
-
-Our trained model 'span.pt' achieves the following intermediate results:
-
-| BLEU 1 | BLEU 4 | Span_F1 |
-|--------|--------|---------|
-| 50.89  | 44.0   | 62.59   |
-
-
-### UniLM Question Generation
-
-We follow [Explicit Memory Tracker](https://github.com/Yifan-Gao/explicit_memory_tracker) for question generation.
-Here we take their trained model and do inference only.
-Please refer to the [Explicit Memory Tracker](https://github.com/Yifan-Gao/explicit_memory_tracker) repo for training details.
-
-The UniLM Question Generation model reads the predicted span from the span extraction model, and rephrases it into the question.
-
-```shell
-PYT_QG -u qg.py \
---fin=./data/sharc_raw/json/sharc_dev.json \
---fpred=./out/inference_span \  # directory of span prediction
---model_recover_path=/absolute/path/to/pretrained_models/qg.bin \
---cache_path=/absolute/path/to/pretrain_models/unilm/
-```
-
-Oracle question generation evaluation results of our released model `unilmqg.bin` (dev. set):
-
-| BLEU 1 | BLEU 2 | BLEU 3 | BLEU 4 |
-|--------|--------|--------|--------|
-| 65.73  | 59.43  | 55.43  | 52.43  |
-
-
-## End-to-End Evaluation (TODO)
 
 
 
