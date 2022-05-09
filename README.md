@@ -97,6 +97,26 @@ You can also download our pretrained models and our dev set predictions:
     └── span.pt
 ```
 
+## Discourse Segmentation of Rules (Section 2.1)
+
+We use [SegBot](http://138.197.118.157:8000/segbot/) and [their implementation](https://www.dropbox.com/sh/tsr4ixfaosk2ecf/AACvXU6gbZfGLatPXDrzNcXCa?dl=0) to segment rules in the ShARC regulation snippets.
+
+```shell
+cd segedu
+PYT_SEGBOT preprocess_discourse_segment.py
+PYT_SEGBOT sharc_discourse_segmentation.py
+```
+
+`data/train_snippet_parsed.json` and `data/dev_snippet_parsed.json` are parsed rules.
+
+## Fix Questions in ShARC
+
+We find in some cases, there are some extra/missing spaces in ShARC questions. Here we fix them by merging these questions:
+
+```shell
+PYT_DISCERN fix_questions.py
+```
+
 ## Using [splinter](https://arxiv.org/pdf/2101.00438.pdf) model to do decision Making (Section 2.2)
 > Update transformers version to 4.17.0 under PYT_DISCERN environment
 ```shell
