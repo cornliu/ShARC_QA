@@ -45,13 +45,7 @@ You can also download our pretrained models and our dev set predictions:
 └── data
     └── ...
 └── pretrained_models
-    └── unilm
-        └── ...
-        └── unilmqg.bin
-    └── roberta_base
-        └── ...
-    └── decision.pt
-    └── span.pt
+    └── best.pt
 ```
 
 ## Discourse Segmentation of Rules (Section 2.1)
