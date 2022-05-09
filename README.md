@@ -131,8 +131,8 @@ PYT_DISCERN preprocess_decision.py
 > training
 
 ```shell
-MODEL="splinter"
-python3 -u train_sharc.py \
+
+PYT_DISCERN -u train_sharc.py \
     --train_batch=16 \
     --gradient_accumulation_steps=2 \
     --epoch=5 \
@@ -148,6 +148,23 @@ python3 -u train_sharc.py \
     --trans_layer=2 \
     --eval_every_steps=300 \
     --pretrained_lm_path="tau/splinter-base"
+```
+
+> inference
+
+During training, the checkpoint will be saved in `out/train_decision/`, you can use the checkpoint to do inference, for example
+
+```
+PYT_DISCERN train_sharc.py \
+    --dsave="./out/{}" \
+    --model=decision \
+    --data=./data/ \
+    --data_type=decision_splinter_base \
+    --prefix=inference_decision \
+    --resume=./out/train_decision/best.pt \
+    --trans_layer=2 \
+    --pretrained_lm_path="tau/splinter-base" \
+    --test
 ```
 
 
