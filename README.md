@@ -21,6 +21,10 @@ pip install editdistance==0.5.2 transformers==2.8.0
 pip install transformers==4.17.0
 ```
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 864590206c9317df59180b8c1fe4fb8594ffe5e6
 > Download ShARC data
 ```bash
 mkdir data
