@@ -80,12 +80,12 @@ Under `discern` environment, run
 > We find in some cases, there are some extra/missing spaces in ShARC questions. Here we fix them by merging these questions:
 
 ```shell
+cd ..
 python fix_questions.py
 ```
 > preprocess: prepare inputs for splinter, generate labels for entailment supervision
 
 ```shell
-cd ..
 python preprocess_decision.py
 ```
 
