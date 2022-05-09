@@ -32,7 +32,11 @@ cd ..
 ```
 
 You can also download our pretrained models and our dev set predictions:
-- Decision Making Model: [decision.pt](https://drive.google.com/file/d/1hVeSwSabpkIoUflZmPcJHhkzHAKXeOxI/view?usp=sharing)
+- Decision Making Model: [decision.pt](https://www.dropbox.com/s/fr5gskc9kr55pf8/splinter?dl=0)
+> how to download checkpoint
+```shell
+wget https://www.dropbox.com/s/fr5gskc9kr55pf8/splinter?dl=1
+```
 > We would now set up our directories like this:
 
 ```
