@@ -119,7 +119,7 @@ python -u train_sharc.py \
 
 > inference
 
-During training, the checkpoint will be saved in `out/train_decision/`, notice that you can specify your own model path at `--resume`. Below is the example command.
+During training, the checkpoint will be saved in `out/train_decision/`, if you want to reproduce our results, you can set `--resume=./pretrained_models/best.pt`. Below is the example command.
 
 ```shell
 python train_sharc.py \
