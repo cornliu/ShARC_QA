@@ -1,5 +1,5 @@
 # ShARC QA
-This folder contains several scripts that help you to train or test our model.
+Since we used the pytorch0.4 this pytorch version is too old that is incompatible with docker, we write this readme. By following this readme you can train and test our work.
 
 ## Requirements
 > Discourse segmentation environment (`PYT_SEGBOT`)
@@ -14,7 +14,7 @@ conda install nltk==3.4.5 numpy==1.18.1 pycparser==2.20 six==1.14.0 tqdm==4.44.1
 
 ```bash
 conda create -n discern python=3.6
-conda install pytorch==1.0.1 cudatoolkit=10.0 -c pytorch
+conda install pytorch==1.10.1 cudatoolkit=10.2 -c pytorch
 conda install spacy==2.0.16 scikit-learn
 python -m spacy download en_core_web_lg && python -m spacy download en_core_web_md
 pip install editdistance==0.5.2 transformers==2.8.0
