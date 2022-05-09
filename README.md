@@ -1,32 +1,5 @@
-# Discern: Discourse-Aware Entailment Reasoning Network for Conversational Machine Reading (EMNLP 2020)
-
-This repository is the implementation of our EMNLP 2020 Paper [Discern: Discourse-Aware Entailment Reasoning Network for Conversational Machine Reading](https://arxiv.org/abs/2010.01838).
-
-`Discern` achieves new state-of-the-art results on [ShARC conversational machine reading benchmark](https://sharc-data.github.io/leaderboard.html) (May 2020).
-
-If you have any question, please open an issue or contact yifangao95@gmail.com
-
-## Reference
-
-If you find our code useful, please cite our papers as follows:
-
-```bibtex
-@article{gao-etal-2020-discern,
-  title={Discern: Discourse-Aware Entailment Reasoning Network for Conversational Machine Reading},
-  author={Yifan Gao and Chien-Sheng Wu and Jingjing Li and Shafiq Joty and Steven C.H. Hoi, Caiming Xiong and Irwin King and Michael R. Lyu},
-  journal={EMNLP},
-  year={2020},
-}
-```
-```bibtex
-@article{gao-etal-2020-explicit,
-  title={Explicit Memory Tracker with Coarse-to-Fine Reasoning for Conversational Machine Reading},
-  author={Yifan Gao and Chien-Sheng Wu and Shafiq R. Joty and Caiming Xiong and Richard Socher and Irwin King and Michael R. Lyu and Steven C. H. Hoi},
-  journal={ACL},
-  year={2020},
-}
-```
-
+# ShARC QA
+This folder contains several scripts that help you to train or test our model.
 
 ## Requirements
 > Discourse segmentation environment (`PYT_SEGBOT`)
@@ -76,6 +49,7 @@ cd data
 wget https://sharc-data.github.io/data/sharc1-official.zip -O sharc_raw.zip
 unzip sharc_raw.zip
 mv sharc1-official/ sharc_raw
+cd ..
 ```
 
 > Download RoBERTa, UniLM
