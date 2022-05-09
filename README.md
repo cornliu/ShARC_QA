@@ -154,7 +154,7 @@ PYT_DISCERN -u train_sharc.py \
 
 During training, the checkpoint will be saved in `out/train_decision/`, you can use the checkpoint to do inference, for example
 
-```
+```shell
 PYT_DISCERN train_sharc.py \
     --dsave="./out/{}" \
     --model=decision \
