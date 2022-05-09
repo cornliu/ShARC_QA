@@ -14,33 +14,11 @@ conda install nltk==3.4.5 numpy==1.18.1 pycparser==2.20 six==1.14.0 tqdm==4.44.1
 
 ```bash
 conda create -n discern python=3.6
-conda install pytorch==1.10.1 cudatoolkit=10.2 -c pytorch
+conda install pytorch==1.10.2 cudatoolkit=10.2 -c pytorch
 conda install spacy==2.0.16 scikit-learn
 python -m spacy download en_core_web_lg && python -m spacy download en_core_web_md
 pip install editdistance==0.5.2 transformers==2.8.0
 pip install transformers==4.17.0
-```
-
-> UniLM question generation environment (`PYT_QG`)
-
-```bash
-# create conda environment
-conda create -n qg python=3.6
-conda install pytorch==1.1 cudatoolkit=10.0 -c pytorch
-conda install spacy==2.0.16 scikit-learn
-python -m spacy download en_core_web_lg && python -m spacy download en_core_web_md
-pip install editdistance==0.5.2
-
-# install apex
-git clone -q https://github.com/NVIDIA/apex.git
-cd apex
-git reset --hard 1603407bf49c7fc3da74fceb6a6c7b47fece2ef8
-python setup.py install --cuda_ext --cpp_ext
-cd ..
-
-# setup unilm
-cd qg
-pip install --editable .
 ```
 
 > Download ShARC data
@@ -79,11 +57,16 @@ You can also download our pretrained models and our dev set predictions:
 ## Discourse Segmentation of Rules (Section 2.1)
 
 We use [SegBot](http://138.197.118.157:8000/segbot/) and [their implementation](https://www.dropbox.com/sh/tsr4ixfaosk2ecf/AACvXU6gbZfGLatPXDrzNcXCa?dl=0) to segment rules in the ShARC regulation snippets.
+> Activate conda environment
 
 ```shell
+conda activate segbot
+```
+Under `segbot` environment, run
+```shell
 cd segedu
-PYT_SEGBOT preprocess_discourse_segment.py
-PYT_SEGBOT sharc_discourse_segmentation.py
+python3 preprocess_discourse_segment.py
+python3 sharc_discourse_segmentation.py
 ```
 
 `data/train_snippet_parsed.json` and `data/dev_snippet_parsed.json` are parsed rules.
@@ -97,6 +80,13 @@ PYT_DISCERN fix_questions.py
 ```
 
 ## Using [splinter](https://arxiv.org/pdf/2101.00438.pdf) model to do decision Making (Section 2.2)
+> Activate conda environment
+
+```shell
+conda activate discern
+```
+Under `discern` environment, run
+
 > preprocess: prepare inputs for splinter, generate labels for entailment supervision
 
 ```shell
@@ -107,7 +97,7 @@ PYT_DISCERN preprocess_decision.py
 
 ```shell
 
-PYT_DISCERN -u train_sharc.py \
+python3 -u train_sharc.py \
     --train_batch=16 \
     --gradient_accumulation_steps=2 \
     --epoch=5 \
@@ -130,7 +120,7 @@ PYT_DISCERN -u train_sharc.py \
 During training, the checkpoint will be saved in `out/train_decision/`, you can use the checkpoint to do inference, for example
 
 ```shell
-PYT_DISCERN train_sharc.py \
+python3 train_sharc.py \
     --dsave="./out/{}" \
     --model=decision \
     --data=./data/ \
