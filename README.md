@@ -35,7 +35,9 @@ You can also download our pretrained models and our dev set predictions:
 - Decision Making Model: [decision.pt](https://www.dropbox.com/s/fr5gskc9kr55pf8/splinter?dl=0)
 > how to download checkpoint
 ```shell
-wget https://www.dropbox.com/s/fr5gskc9kr55pf8/splinter?dl=1
+mkdir pretrained_models
+cd pretrained_models
+wget https://www.dropbox.com/s/fr5gskc9kr55pf8/splinter?dl=1 -O best.pt
 ```
 > We would now set up our directories like this:
 
