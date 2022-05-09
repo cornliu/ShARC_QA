@@ -32,7 +32,7 @@ cd ..
 ```
 
 You can also download our pretrained models and our dev set predictions:
-- Decision Making Model: [decision.pt](https://drive.google.com/file/d/1HZFi4p0tZtR5Z6msMVewi23rCdy3VclS/view?usp=sharing)
+- Decision Making Model: [decision.pt](https://drive.google.com/file/d/1hVeSwSabpkIoUflZmPcJHhkzHAKXeOxI/view?usp=sharing)
 > We would now set up our directories like this:
 
 ```
