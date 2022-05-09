@@ -21,10 +21,6 @@ pip install editdistance==0.5.2 transformers==2.8.0
 pip install transformers==4.17.0
 ```
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 864590206c9317df59180b8c1fe4fb8594ffe5e6
 > Download ShARC data
 ```bash
 mkdir data
@@ -49,13 +45,7 @@ You can also download our pretrained models and our dev set predictions:
 └── data
     └── ...
 └── pretrained_models
-    └── unilm
-        └── ...
-        └── unilmqg.bin
-    └── roberta_base
-        └── ...
-    └── decision.pt
-    └── span.pt
+    └── best.pt
 ```
 
 ## Discourse Segmentation of Rules (Section 2.1)
@@ -69,19 +59,15 @@ conda activate segbot
 Under `segbot` environment, run
 ```shell
 cd segedu
-python3 preprocess_discourse_segment.py
-python3 sharc_discourse_segmentation.py
+python preprocess_discourse_segment.py
+python sharc_discourse_segmentation.py
 ```
 
 `data/train_snippet_parsed.json` and `data/dev_snippet_parsed.json` are parsed rules.
 
 ## Fix Questions in ShARC
 
-We find in some cases, there are some extra/missing spaces in ShARC questions. Here we fix them by merging these questions:
 
-```shell
-PYT_DISCERN fix_questions.py
-```
 
 ## Using [splinter](https://arxiv.org/pdf/2101.00438.pdf) model to do decision Making (Section 2.2)
 > Activate conda environment
@@ -91,17 +77,23 @@ conda activate discern
 ```
 Under `discern` environment, run
 
+> We find in some cases, there are some extra/missing spaces in ShARC questions. Here we fix them by merging these questions:
+
+```shell
+python fix_questions.py
+```
 > preprocess: prepare inputs for splinter, generate labels for entailment supervision
 
 ```shell
-PYT_DISCERN preprocess_decision.py
+cd ..
+python preprocess_decision.py
 ```
 
 > training
 
 ```shell
 
-python3 -u train_sharc.py \
+python -u train_sharc.py \
     --train_batch=16 \
     --gradient_accumulation_steps=2 \
     --epoch=5 \
@@ -124,7 +116,7 @@ python3 -u train_sharc.py \
 During training, the checkpoint will be saved in `out/train_decision/`, you can use the checkpoint to do inference, for example
 
 ```shell
-python3 train_sharc.py \
+python train_sharc.py \
     --dsave="./out/{}" \
     --model=decision \
     --data=./data/ \
