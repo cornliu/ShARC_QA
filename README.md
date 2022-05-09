@@ -122,7 +122,7 @@ PYT_DISCERN fix_questions.py
 ```shell
 pip install transformers==4.17.0
 ```
-> preprocess: prepare inputs for RoBERTa, generate labels for entailment supervision
+> preprocess: prepare inputs for splinter, generate labels for entailment supervision
 
 ```shell
 PYT_DISCERN preprocess_decision.py
