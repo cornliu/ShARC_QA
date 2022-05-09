@@ -21,27 +21,6 @@ pip install editdistance==0.5.2 transformers==2.8.0
 pip install transformers==4.17.0
 ```
 
-> UniLM question generation environment (`PYT_QG`)
-
-```bash
-# create conda environment
-conda create -n qg python=3.6
-conda install pytorch==1.1 cudatoolkit=10.0 -c pytorch
-conda install spacy==2.0.16 scikit-learn
-python -m spacy download en_core_web_lg && python -m spacy download en_core_web_md
-pip install editdistance==0.5.2
-
-# install apex
-git clone -q https://github.com/NVIDIA/apex.git
-cd apex
-git reset --hard 1603407bf49c7fc3da74fceb6a6c7b47fece2ef8
-python setup.py install --cuda_ext --cpp_ext
-cd ..
-
-# setup unilm
-cd qg
-pip install --editable .
-```
 
 > Download ShARC data
 ```bash
