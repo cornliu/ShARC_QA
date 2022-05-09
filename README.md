@@ -1,5 +1,5 @@
 # ShARC QA
-Since we used the pytorch0.4 this pytorch version is too old that is incompatible with docker, we write this readme. By following this readme you can train and test our work.
+Since we used the `pytorch0.4` this pytorch version is too old that is incompatible with docker, we write this readme. By following this readme you can train and test our work.
 
 ## Requirements
 > Discourse segmentation environment (`PYT_SEGBOT`)
@@ -54,7 +54,7 @@ cd ..
 ```
 
 You can also download our pretrained models and our dev set predictions:
-- Decision Making Model: [decision.pt](https://mycuhk-my.sharepoint.com/:u:/g/personal/1155102332_link_cuhk_edu_hk/ESrX-zVkGjZBsHofDoChXIYB1UVlgld3jJZyeJcZApemCQ?e=ggQy1w)
+- Decision Making Model: [decision.pt](https://drive.google.com/file/d/1HZFi4p0tZtR5Z6msMVewi23rCdy3VclS/view?usp=sharing)
 > We would now set up our directories like this:
 
 ```
