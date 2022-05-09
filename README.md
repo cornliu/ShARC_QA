@@ -18,6 +18,7 @@ conda install pytorch==1.0.1 cudatoolkit=10.0 -c pytorch
 conda install spacy==2.0.16 scikit-learn
 python -m spacy download en_core_web_lg && python -m spacy download en_core_web_md
 pip install editdistance==0.5.2 transformers==2.8.0
+pip install transformers==4.17.0
 ```
 
 > UniLM question generation environment (`PYT_QG`)
@@ -52,28 +53,8 @@ mv sharc1-official/ sharc_raw
 cd ..
 ```
 
-> Download RoBERTa, UniLM
-```bash
-mkdir pretrained_models
-# RoBERTa
-mkdir pretrained_models/roberta_base
-wget --quiet https://s3.amazonaws.com/models.huggingface.co/bert/roberta-base-config.json -O pretrained_models/roberta_base/config.json
-wget --quiet https://cdn.huggingface.co/roberta-base-merges.txt -O pretrained_models/roberta_base/merges.txt
-wget --quiet https://cdn.huggingface.co/roberta-base-pytorch_model.bin -O pretrained_models/roberta_base/pytorch_model.bin
-wget --quiet https://cdn.huggingface.co/roberta-base-vocab.json -O pretrained_models/roberta_base/vocab.json
-# UniLM & BERT
-mkdir pretrained_models/unilm
-wget --quiet https://unilm.blob.core.windows.net/ckpt/unilm1-large-cased.bin -O pretrained_models/unilm/unilmv1-large-cased.bin
-wget --quiet https://s3.amazonaws.com/models.huggingface.co/bert/bert-large-cased-vocab.txt -O pretrained_models/unilm/bert-large-cased-vocab.txt
-wget --quiet https://s3.amazonaws.com/models.huggingface.co/bert/bert-large-cased.tar.gz -O pretrained_models/unilm/bert-large-cased.tar.gz
-cd pretrained_models/unilm
-tar -zxvf bert-large-cased.tar.gz
-rm bert-large-cased.tar.gz
-```
 You can also download our pretrained models and our dev set predictions:
 - Decision Making Model: [decision.pt](https://mycuhk-my.sharepoint.com/:u:/g/personal/1155102332_link_cuhk_edu_hk/ESrX-zVkGjZBsHofDoChXIYB1UVlgld3jJZyeJcZApemCQ?e=ggQy1w)
-- Span Extraction Model: [span.pt](https://mycuhk-my.sharepoint.com/:u:/g/personal/1155102332_link_cuhk_edu_hk/EZ7e3LDwYZlHtg917fTsK2gBUp7HD52wzE65mKSx4FY5uQ?e=kVXjyC)
-- Question Generation Model: [unilmqg.bin](https://mycuhk-my.sharepoint.com/:u:/g/personal/1155102332_link_cuhk_edu_hk/ER4GRoby0ORGjIYUKLo-Tc4Bq-G7De5qElmJh_Rt_EtGqQ?e=8Yeuix)
 > We would now set up our directories like this:
 
 ```
@@ -81,8 +62,6 @@ You can also download our pretrained models and our dev set predictions:
 └── model
     └── ...
 └── segedu
-    └── ...
-└── unilmqg
     └── ...
 └── README.md
 └── data
@@ -118,10 +97,6 @@ PYT_DISCERN fix_questions.py
 ```
 
 ## Using [splinter](https://arxiv.org/pdf/2101.00438.pdf) model to do decision Making (Section 2.2)
-> Update transformers version to 4.17.0 under PYT_DISCERN environment
-```shell
-pip install transformers==4.17.0
-```
 > preprocess: prepare inputs for splinter, generate labels for entailment supervision
 
 ```shell
@@ -166,6 +141,4 @@ PYT_DISCERN train_sharc.py \
     --pretrained_lm_path="tau/splinter-base" \
     --test
 ```
-
-
 
